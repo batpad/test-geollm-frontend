@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Backend Tester</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .input-section {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        textarea {
+            min-height: 60px;
+            resize: vertical;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .response-section {
+            margin-top: 20px;
+        }
+        .response-display {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            min-height: 200px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .status.loading {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Agent Backend Tester</h1>
+        
+        <div class="input-section">
+            <label for="accessToken">Access Token:</label>
+            <input type="text" id="accessToken" placeholder="Paste your access token here">
+        </div>
+
+        <div class="input-section">
+            <label for="userId">User ID:</label>
+            <input type="text" id="userId" value="001">
+        </div>
+
+        <div class="input-section">
+            <label for="sessionId">Session ID:</label>
+            <input type="text" id="sessionId" value="8492899942069698560">
+        </div>
+
+        <div class="input-section">
+            <label for="message">Message:</label>
+            <textarea id="message" placeholder="Enter your message here">Give me the area covered by mangroves in Mumbai</textarea>
+        </div>
+
+        <button id="sendButton" onclick="sendMessage()">Send Message</button>
+        <button id="clearButton" onclick="clearResponse()">Clear Response</button>
+
+        <div class="response-section">
+            <h3>Response:</h3>
+            <div id="status"></div>
+            <div id="response" class="response-display"></div>
+        </div>
+    </div>
+
+    <script src="index.js"></script>
+</body>
+</html>
