@@ -17,6 +17,12 @@ function appendToResponse(text) {
     responseDiv.textContent += text;
 }
 
+function appendFormattedJSON(jsonData) {
+    const responseDiv = document.getElementById('response');
+    const formatted = JSON.stringify(jsonData, null, 2);
+    responseDiv.textContent += formatted + '\n\n---\n\n';
+}
+
 function clearResponse() {
     document.getElementById('response').textContent = '';
     document.getElementById('status').textContent = '';
@@ -222,25 +228,27 @@ async function sendMessage() {
             for (const line of lines) {
                 if (line.trim() === '') continue;
                 
-                // Handle SSE format
+                // Handle SSE format (if it comes)
                 if (line.startsWith('data: ')) {
                     const data = line.substring(6);
                     if (data.trim() === '[DONE]') {
                         setStatus('Stream completed', 'success');
                         break;
                     }
-                    
                     try {
-                        // Format and display the JSON
-                        const formattedJSON = formatJSON(data);
-                        appendToResponse(formattedJSON + '\n\n---\n\n');
+                        const parsed = JSON.parse(data);
+                        appendFormattedJSON(parsed);
                     } catch (e) {
-                        // If it's not valid JSON, just display as is
                         appendToResponse(data + '\n\n');
                     }
                 } else {
-                    // Handle other SSE fields or raw data
-                    appendToResponse(line + '\n');
+                    // Handle raw JSON lines (actual format)
+                    try {
+                        const parsed = JSON.parse(line);
+                        appendFormattedJSON(parsed);
+                    } catch (e) {
+                        appendToResponse(line + '\n');
+                    }
                 }
             }
         }
