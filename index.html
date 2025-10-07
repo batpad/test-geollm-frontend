@@ -67,6 +67,9 @@
             font-family: 'Courier New', monospace;
             font-size: 12px;
             overflow-x: auto;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            tab-size: 2;
         }
         .status {
             margin: 10px 0;
@@ -109,6 +112,19 @@
             margin: 10px 0;
             font-family: monospace;
         }
+        .input-with-button {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        .input-with-button input {
+            flex: 1;
+        }
+        .input-with-button button {
+            margin-top: 0;
+            padding: 8px 12px;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -120,7 +136,10 @@
             
             <div class="input-section">
                 <label for="accessToken">Access Token:</label>
-                <input type="text" id="accessToken" placeholder="Paste your access token here">
+                <div class="input-with-button">
+                    <input type="text" id="accessToken" placeholder="Paste your access token here">
+                    <button id="saveTokenButton" onclick="saveAccessToken()">Save</button>
+                </div>
             </div>
 
             <div class="input-section">

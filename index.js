@@ -4,6 +4,8 @@ const SESSION_API_ENDPOINT = 'https://us-central1-aiplatform.googleapis.com/v1/p
 let currentSessionId = null;
 let currentUserId = null;
 
+const ACCESS_TOKEN_KEY = 'agent_access_token';
+
 function setStatus(message, type = 'loading') {
     const statusDiv = document.getElementById('status');
     statusDiv.textContent = message;
@@ -57,6 +59,44 @@ function updateSessionInfo(sessionId, userId) {
     enableChatSection();
 }
 
+function saveAccessToken() {
+    const accessToken = document.getElementById('accessToken').value.trim();
+    
+    if (!accessToken) {
+        setStatus('Please enter an access token to save', 'error');
+        return;
+    }
+    
+    try {
+        localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+        setStatus('Access token saved successfully!', 'success');
+        
+        // Clear the status after 2 seconds
+        setTimeout(() => {
+            if (document.getElementById('status').textContent === 'Access token saved successfully!') {
+                document.getElementById('status').textContent = '';
+                document.getElementById('status').className = 'status';
+            }
+        }, 2000);
+    } catch (error) {
+        console.error('Error saving access token:', error);
+        setStatus('Error saving access token', 'error');
+    }
+}
+
+function loadAccessToken() {
+    try {
+        const savedToken = localStorage.getItem(ACCESS_TOKEN_KEY);
+        if (savedToken) {
+            document.getElementById('accessToken').value = savedToken;
+            return true;
+        }
+    } catch (error) {
+        console.error('Error loading access token:', error);
+    }
+    return false;
+}
+
 async function createSession() {
     const accessToken = document.getElementById('accessToken').value.trim();
     const userId = document.getElementById('userId').value.trim() || '001';
@@ -97,7 +137,7 @@ async function createSession() {
             updateSessionInfo(data.output.id, userId);
             setStatus('Session created successfully!', 'success');
             clearResponse();
-            appendToResponse(`Session Created:\n${formatJSON(JSON.stringify(data))}\n\n---\n\n`);
+            appendToResponse(`Session Created:\n${JSON.stringify(data, null, 2)}\n\n---\n\n`);
         } else {
             throw new Error('Invalid response format - missing session ID');
         }
@@ -224,6 +264,15 @@ document.getElementById('message').addEventListener('keypress', function(event) 
 
 // Auto-focus on access token input when page loads
 window.addEventListener('load', function() {
-    document.getElementById('accessToken').focus();
     disableChatSection(); // Ensure chat is disabled initially
+    
+    // Load saved access token if it exists
+    const tokenLoaded = loadAccessToken();
+    
+    // Focus on the appropriate field
+    if (tokenLoaded) {
+        document.getElementById('userId').focus();
+    } else {
+        document.getElementById('accessToken').focus();
+    }
 });
