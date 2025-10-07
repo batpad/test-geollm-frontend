@@ -1,4 +1,8 @@
-const API_ENDPOINT = 'https://us-central1-aiplatform.googleapis.com/v1/projects/folkloric-vault-454309-q6/locations/us-central1/reasoningEngines/3836948135263862784:streamQuery?alt=sse';
+const STREAM_API_ENDPOINT = 'https://us-central1-aiplatform.googleapis.com/v1/projects/folkloric-vault-454309-q6/locations/us-central1/reasoningEngines/3836948135263862784:streamQuery?alt=sse';
+const SESSION_API_ENDPOINT = 'https://us-central1-aiplatform.googleapis.com/v1/projects/folkloric-vault-454309-q6/locations/us-central1/reasoningEngines/3836948135263862784:query';
+
+let currentSessionId = null;
+let currentUserId = null;
 
 function setStatus(message, type = 'loading') {
     const statusDiv = document.getElementById('status');
@@ -26,12 +30,96 @@ function formatJSON(jsonString) {
     }
 }
 
+function enableChatSection() {
+    const chatSection = document.getElementById('chatSection');
+    const sendButton = document.getElementById('sendButton');
+    
+    chatSection.classList.remove('section-disabled');
+    sendButton.disabled = false;
+}
+
+function disableChatSection() {
+    const chatSection = document.getElementById('chatSection');
+    const sendButton = document.getElementById('sendButton');
+    
+    chatSection.classList.add('section-disabled');
+    sendButton.disabled = true;
+}
+
+function updateSessionInfo(sessionId, userId) {
+    currentSessionId = sessionId;
+    currentUserId = userId;
+    
+    document.getElementById('currentSessionId').textContent = sessionId;
+    document.getElementById('currentUserId').textContent = userId;
+    document.getElementById('sessionInfo').style.display = 'block';
+    
+    enableChatSection();
+}
+
+async function createSession() {
+    const accessToken = document.getElementById('accessToken').value.trim();
+    const userId = document.getElementById('userId').value.trim() || '001';
+    const createSessionButton = document.getElementById('createSessionButton');
+
+    if (!accessToken) {
+        setStatus('Please enter an access token', 'error');
+        return;
+    }
+
+    setStatus('Creating new session...', 'loading');
+    createSessionButton.disabled = true;
+
+    const requestBody = {
+        class_method: "async_create_session",
+        input: {
+            user_id: userId
+        }
+    };
+
+    try {
+        const response = await fetch(SESSION_API_ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        if (data.output && data.output.id) {
+            updateSessionInfo(data.output.id, userId);
+            setStatus('Session created successfully!', 'success');
+            clearResponse();
+            appendToResponse(`Session Created:\n${formatJSON(JSON.stringify(data))}\n\n---\n\n`);
+        } else {
+            throw new Error('Invalid response format - missing session ID');
+        }
+
+    } catch (error) {
+        console.error('Error creating session:', error);
+        setStatus(`Error creating session: ${error.message}`, 'error');
+        disableChatSection();
+    } finally {
+        createSessionButton.disabled = false;
+    }
+}
+
 async function sendMessage() {
     const accessToken = document.getElementById('accessToken').value.trim();
-    const userId = document.getElementById('userId').value.trim();
-    const sessionId = document.getElementById('sessionId').value.trim();
     const message = document.getElementById('message').value.trim();
     const sendButton = document.getElementById('sendButton');
+
+    if (!currentSessionId || !currentUserId) {
+        setStatus('Please create a session first', 'error');
+        return;
+    }
 
     if (!accessToken) {
         setStatus('Please enter an access token', 'error');
@@ -50,14 +138,14 @@ async function sendMessage() {
     const requestBody = {
         class_method: "async_stream_query",
         input: {
-            user_id: userId,
-            session_id: sessionId,
+            user_id: currentUserId,
+            session_id: currentSessionId,
             message: message
         }
     };
 
     try {
-        const response = await fetch(API_ENDPOINT, {
+        const response = await fetch(STREAM_API_ENDPOINT, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
@@ -134,7 +222,8 @@ document.getElementById('message').addEventListener('keypress', function(event) 
     }
 });
 
-// Auto-focus on message input when page loads
+// Auto-focus on access token input when page loads
 window.addEventListener('load', function() {
-    document.getElementById('message').focus();
+    document.getElementById('accessToken').focus();
+    disableChatSection(); // Ensure chat is disabled initially
 });

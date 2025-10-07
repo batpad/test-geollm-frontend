@@ -85,34 +85,69 @@
             background-color: #f8d7da;
             color: #721c24;
         }
+        .session-section {
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: #f8f9fa;
+        }
+        .chat-section {
+            border: 2px solid #28a745;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .section-disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .session-info {
+            background-color: #e9ecef;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Agent Backend Tester</h1>
         
-        <div class="input-section">
-            <label for="accessToken">Access Token:</label>
-            <input type="text" id="accessToken" placeholder="Paste your access token here">
+        <div class="session-section">
+            <h2>1. Create Session</h2>
+            
+            <div class="input-section">
+                <label for="accessToken">Access Token:</label>
+                <input type="text" id="accessToken" placeholder="Paste your access token here">
+            </div>
+
+            <div class="input-section">
+                <label for="userId">User ID (optional):</label>
+                <input type="text" id="userId" value="001" placeholder="Enter user ID or leave as 001">
+            </div>
+
+            <button id="createSessionButton" onclick="createSession()">Create New Session</button>
+            
+            <div id="sessionInfo" class="session-info" style="display: none;">
+                <strong>Active Session:</strong><br>
+                Session ID: <span id="currentSessionId"></span><br>
+                User ID: <span id="currentUserId"></span>
+            </div>
         </div>
 
-        <div class="input-section">
-            <label for="userId">User ID:</label>
-            <input type="text" id="userId" value="001">
-        </div>
+        <div class="chat-section section-disabled" id="chatSection">
+            <h2>2. Send Messages</h2>
+            
+            <div class="input-section">
+                <label for="message">Message:</label>
+                <textarea id="message" placeholder="Enter your message here">Give me the area covered by mangroves in Mumbai</textarea>
+            </div>
 
-        <div class="input-section">
-            <label for="sessionId">Session ID:</label>
-            <input type="text" id="sessionId" value="8492899942069698560">
+            <button id="sendButton" onclick="sendMessage()" disabled>Send Message</button>
+            <button id="clearButton" onclick="clearResponse()">Clear Response</button>
         </div>
-
-        <div class="input-section">
-            <label for="message">Message:</label>
-            <textarea id="message" placeholder="Enter your message here">Give me the area covered by mangroves in Mumbai</textarea>
-        </div>
-
-        <button id="sendButton" onclick="sendMessage()">Send Message</button>
-        <button id="clearButton" onclick="clearResponse()">Clear Response</button>
 
         <div class="response-section">
             <h3>Response:</h3>
