@@ -2,6 +2,8 @@
 
 A simple frontend application for testing communication and interaction with an Agent backend that uses ADK (Agent Development Kit).
 
+**Try it at: https://batpad.github.io/test-geollm-frontend/**
+
 ## Overview
 
 This application provides a web interface to:
@@ -15,7 +17,6 @@ This application provides a web interface to:
 
 - Access to a gcloud account with permissions for the agent backend
 - A web browser
-- Terminal access for generating access tokens
 
 ### Setup
 
@@ -71,8 +72,19 @@ Response format: Raw JSON objects streamed line-by-line (not Server-Sent Events 
 
 ## Development
 
-This is a simple HTML/JavaScript application with no build process required. To modify:
+For development, run a simple web server in this folder:
 
+**Python:**
+```bash
+python -m http.server 8000
+```
+
+**Node.js:**
+```bash
+npx serve .
+```
+
+To modify:
 1. Edit `index.html` for UI changes
 2. Edit `index.js` for functionality changes
 3. Refresh the browser to see changes
