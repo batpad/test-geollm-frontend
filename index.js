@@ -228,27 +228,11 @@ async function sendMessage() {
             for (const line of lines) {
                 if (line.trim() === '') continue;
                 
-                // Handle SSE format (if it comes)
-                if (line.startsWith('data: ')) {
-                    const data = line.substring(6);
-                    if (data.trim() === '[DONE]') {
-                        setStatus('Stream completed', 'success');
-                        break;
-                    }
-                    try {
-                        const parsed = JSON.parse(data);
-                        appendFormattedJSON(parsed);
-                    } catch (e) {
-                        appendToResponse(data + '\n\n');
-                    }
-                } else {
-                    // Handle raw JSON lines (actual format)
-                    try {
-                        const parsed = JSON.parse(line);
-                        appendFormattedJSON(parsed);
-                    } catch (e) {
-                        appendToResponse(line + '\n');
-                    }
+                try {
+                    const parsed = JSON.parse(line);
+                    appendFormattedJSON(parsed);
+                } catch (e) {
+                    appendToResponse(line + '\n');
                 }
             }
         }
