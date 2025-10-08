@@ -11,6 +11,20 @@ This application provides a web interface to:
 - Send messages and receive streaming responses
 - View formatted JSON responses from the agent
 
+## Configuration
+
+### Agent URL
+The application can work with different agent backends by configuring the Agent URL. This is the base URL for your reasoning engine, which typically looks like:
+```
+https://us-central1-aiplatform.googleapis.com/v1/projects/your-project/locations/us-central1/reasoningEngines/123456789
+```
+
+### Saving Settings
+The application includes "Save" buttons for both the Agent URL and Access Token. These store your settings in the browser's local storage, so you don't need to re-enter them each time you use the application. Your saved settings are:
+- **Agent URL**: Automatically loaded on page refresh
+- **Access Token**: Automatically loaded on page refresh
+- **Local only**: Settings are stored locally in your browser and not sent anywhere
+
 ## Getting Started
 
 ### Prerequisites
