@@ -149,6 +149,17 @@
             <h2>1. Create Session</h2>
             
             <div class="input-section">
+                <label for="agentUrl">Agent URL:</label>
+                <div class="input-with-button">
+                    <input type="text" id="agentUrl" placeholder="Base URL for the agent">
+                    <button id="saveAgentUrlButton" onclick="saveAgentUrl()">Save</button>
+                </div>
+                <div class="help-text">
+                    Base URL for the agent. Example: <code>https://us-central1-aiplatform.googleapis.com/v1/projects/your-project/locations/us-central1/reasoningEngines/123456789</code>
+                </div>
+            </div>
+            
+            <div class="input-section">
                 <label for="accessToken">Access Token:</label>
                 <div class="input-with-button">
                     <input type="text" id="accessToken" placeholder="Paste your access token here">

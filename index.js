@@ -1,10 +1,18 @@
-const STREAM_API_ENDPOINT = 'https://us-central1-aiplatform.googleapis.com/v1/projects/folkloric-vault-454309-q6/locations/us-central1/reasoningEngines/3836948135263862784:streamQuery?alt=sse';
-const SESSION_API_ENDPOINT = 'https://us-central1-aiplatform.googleapis.com/v1/projects/folkloric-vault-454309-q6/locations/us-central1/reasoningEngines/3836948135263862784:query';
+const DEFAULT_BASE_URL = 'https://us-central1-aiplatform.googleapis.com/v1/projects/folkloric-vault-454309-q6/locations/us-central1/reasoningEngines/3836948135263862784';
 
 let currentSessionId = null;
 let currentUserId = null;
 
 const ACCESS_TOKEN_KEY = 'agent_access_token';
+const AGENT_URL_KEY = 'agent_base_endpoint';
+
+function getApiEndpoints() {
+    const baseUrl = document.getElementById('agentUrl').value.trim() || DEFAULT_BASE_URL;
+    return {
+        session: `${baseUrl}:query`,
+        stream: `${baseUrl}:streamQuery?alt=sse`
+    };
+}
 
 function setStatus(message, type = 'loading') {
     const statusDiv = document.getElementById('status');
@@ -103,6 +111,48 @@ function loadAccessToken() {
     return false;
 }
 
+function saveAgentUrl() {
+    const agentUrl = document.getElementById('agentUrl').value.trim();
+    
+    if (!agentUrl) {
+        setStatus('Please enter an agent URL to save', 'error');
+        return;
+    }
+    
+    try {
+        localStorage.setItem(AGENT_URL_KEY, agentUrl);
+        setStatus('Agent URL saved successfully!', 'success');
+        
+        // Clear the status after 2 seconds
+        setTimeout(() => {
+            if (document.getElementById('status').textContent === 'Agent URL saved successfully!') {
+                document.getElementById('status').textContent = '';
+                document.getElementById('status').className = 'status';
+            }
+        }, 2000);
+    } catch (error) {
+        console.error('Error saving agent URL:', error);
+        setStatus('Error saving agent URL', 'error');
+    }
+}
+
+function loadAgentUrl() {
+    try {
+        const savedUrl = localStorage.getItem(AGENT_URL_KEY);
+        if (savedUrl) {
+            document.getElementById('agentUrl').value = savedUrl;
+            return true;
+        } else {
+            // Set default value if nothing saved
+            document.getElementById('agentUrl').value = DEFAULT_BASE_URL;
+        }
+    } catch (error) {
+        console.error('Error loading agent URL:', error);
+        document.getElementById('agentUrl').value = DEFAULT_BASE_URL;
+    }
+    return false;
+}
+
 async function createSession() {
     const accessToken = document.getElementById('accessToken').value.trim();
     const userId = document.getElementById('userId').value.trim() || '001';
@@ -124,7 +174,8 @@ async function createSession() {
     };
 
     try {
-        const response = await fetch(SESSION_API_ENDPOINT, {
+        const endpoints = getApiEndpoints();
+        const response = await fetch(endpoints.session, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
@@ -191,7 +242,8 @@ async function sendMessage() {
     };
 
     try {
-        const response = await fetch(STREAM_API_ENDPOINT, {
+        const endpoints = getApiEndpoints();
+        const response = await fetch(endpoints.stream, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
@@ -258,7 +310,8 @@ document.getElementById('message').addEventListener('keypress', function(event) 
 window.addEventListener('load', function() {
     disableChatSection(); // Ensure chat is disabled initially
     
-    // Load saved access token if it exists
+    // Load saved agent URL and access token if they exist
+    loadAgentUrl();
     const tokenLoaded = loadAccessToken();
     
     // Focus on the appropriate field
